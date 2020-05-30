@@ -5,6 +5,9 @@ bbb_coturn_enable: true
 bbb_turn_enable: true
 bbb_turn_server: "{{ bbb_hostname }}"
 bbb_greenlight_enable: true
+bbb_greenlight_users: []
+#  - { name: '', email: '', password: '', type: 'user' }
+#  - { name: '', email: '', password: '', type: 'admin' }
 bbb_api_demos_enable: false
 bbb_nodejs_version: 8.x
 # ALWAYS_ACCEPT, ALWAYS_DENY, ASK_MODERATOR
