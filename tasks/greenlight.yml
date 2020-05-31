@@ -12,6 +12,7 @@
       - docker
       - docker-compose
     state: present
+    executable: "{{ bbb_greenlight_pip | default('pip3') }}"
 
 - name: create greenlight directory
   file:
@@ -21,6 +22,8 @@
 - name: register bbb secret
   command: bbb-conf --secret
   register: result
+  changed_when: false
+  no_log: true
   when: not bbb_secret is defined
 
 - name: parse bbb secret
@@ -28,6 +31,7 @@
     bbb_secret: "{{ result.stdout | regex_search('Secret: ([a-zA-Z0-9]*)', multiline=True) |  regex_replace('Secret: ') }}"
     cacheable: true
   when: not bbb_secret is defined
+  no_log: true
 
 - name: copy greenlight config file
   template:
@@ -50,13 +54,19 @@
       docker_compose:
         pull: true
         project_src: /root/greenlight/
+      register: greenlightstart
+
+    - name: Ensure greenlight container fully started
+      pause:
+        seconds: 5
+      when: greenlightstart is changed
 
     # https://docs.bigbluebutton.org/greenlight/gl-admin.html#creating-accounts
     - name: Create greenlight users
       command: "docker exec greenlight-v2 bundle exec rake user:create[\"{{ item.name }}\",\"{{ item.email }}\",\"{{ item.password }}\",\"{{ item.type }}\"]"
       with_items: "{{ bbb_greenlight_users }}"
       register: usercreate
-      failed_when: "'Invalid Arguments' in usercreate.stdout"
+      failed_when: "'Invalid Arguments' in usercreate.stdout or 'rake aborted!' in usercreate.stderr"
       changed_when: "'Account with that email already exists' not in usercreate.stdout"
 
   when: bbb_greenlight_enable
