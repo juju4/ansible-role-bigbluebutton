@@ -63,7 +63,7 @@
   lineinfile:
     path: /etc/bigbluebutton/nginx/sip.nginx
     regexp: "proxy_pass"
-    line: "        proxy_pass https://{{ ansible_default_ipv4.address }}:7443;"
+    line: "        proxy_pass https://{{ bbb_freeswitch_external_ip | default(ansible_default_ipv4.address) }}:7443;"
   notify: reload nginx
 
 - name: set BigBlueButton client to load components via HTTPS
@@ -95,3 +95,6 @@
      src: bbb/bigbluebutton.j2
      dest: /etc/nginx/sites-available/bigbluebutton
   notify: reload nginx
+
+- include_tasks: freeswitch.yml
+  when: bbb_freeswitch_external_ip is defined and bbb_freeswitch_external_ip

@@ -1,0 +1,39 @@
+---
+
+- name: Freeswitch | configure vars.xml
+  lineinfile:
+    path: /opt/freeswitch/conf/vars.xml
+    regexp: "{{ item.re }}"
+    line: "{{ item.l }}"
+  with_items:
+    - { re: "<X-PRE-PROCESS cmd=\"set\" data=\"default_password=.*\"/>",
+        l: "<X-PRE-PROCESS cmd=\"set\" data=\"default_password={{ bbb_freeswitch_defaultpassword | default('1234') }}\"/>"
+      }
+    - { re: "<X-PRE-PROCESS cmd=\"set\" data=\"external_rtp_ip=stun:stun.freeswitch.org\"/>",
+      l: "<X-PRE-PROCESS cmd=\"set\" data=\"external_rtp_ip={{ bbb_freeswitch_external_ip | default('stun:stun.freeswitch.org') }}\"/>"
+      }
+    - { re: "<X-PRE-PROCESS cmd=\"set\" data=\"external_sip_ip=stun:stun.freeswitch.org\"/>",
+      l: "<X-PRE-PROCESS cmd=\"set\" data=\"external_sip_ip={{ bbb_freeswitch_external_ip | default('stun:stun.freeswitch.org') }}\"/>"
+      }
+  notify: restart bigbluebutton
+
+- name: Freeswitch | configure external.xml
+  lineinfile:
+    path: /opt/freeswitch/conf/sip_profiles/external.xml
+    regexp: "{{ item.re }}"
+    line: "{{ item.l }}"
+  with_items:
+    - { re: '<param name="ext-rtp-ip" value=".*"/>',
+        l: '<param name="ext-rtp-ip" value="$${external_rtp_ip}"/>'
+      }
+    - { re: '<param name="ext-sip-ip" value=".*"/>',
+        l: '<param name="ext-sip-ip" value="$${external_sip_ip}"/>'
+      }
+  notify: restart bigbluebutton
+
+- name: bbb-webrtc | align external IP with Freeswitch
+  replace:
+    dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+    regexp: '^  ip: .*'
+    replace: "  ip: {{ bbb_freeswitch_external_ip }}"
+  notify: restart bigbluebutton
