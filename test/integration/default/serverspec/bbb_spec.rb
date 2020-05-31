@@ -30,11 +30,53 @@ describe process("node") do
   its(:count) { should eq 7 }
 end
 
+# node.js
 describe port(9001) do
+  it { should be_listening.with('tcp') }
+end
+describe port(3000) do
   it { should be_listening.with('tcp') }
 end
 describe port(3010) do
   it { should be_listening.with('tcp') }
+end
+
+describe process("java") do
+  its(:count) { should eq 6 }
+end
+
+# java
+describe port(5070) do
+  it { should be_listening.with('tcp') }
+end
+describe port(5080) do
+  it { should be_listening.with('tcp') }
+end
+describe port(9999) do
+  it { should be_listening.with('tcp') }
+end
+
+describe process('soffice.bin') do
+  it { should be_running }
+  it "is listening on port 8100" do
+    expect(port(8100)).to be_listening
+  end
+end
+
+describe process('freeswitch') do
+  it { should be_running }
+  for fport in [ '5060', '5090', '8081' ] do
+    it "is listening on port #{fport}" do
+      expect(port(fport)).to be_listening
+    end
+  end
+end
+
+describe process('kurento-media') do
+  it { should be_running }
+  it "is listening on port 8888" do
+    expect(port(8888)).to be_listening
+  end
 end
 
 describe command('java -version') do
