@@ -45,3 +45,6 @@ suites:
   - name: default-mongo4
     run_list:
     attributes:
+  - name: default-greenlight
+    run_list:
+    attributes:

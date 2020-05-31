@@ -61,6 +61,15 @@ jobs:
       script:
         - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
       if: branch =~ /^devel*/
+    - stage: deployalt
+      name: Ubuntu 16.04 with greenlight
+      env:
+        - distribution: ubuntu
+          version: 16.04
+          suite: default-greenlight
+      script:
+        - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug"
+      if: branch =~ /^devel*/
 
 before_install:
   - env
