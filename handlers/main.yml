@@ -1,4 +1,14 @@
 ---
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: restart coturn
+  service:
+    name: coturn
+    state: reloaded
+
 - name: reload nginx
   service:
     name: nginx
@@ -12,7 +22,3 @@
   service:
     name: mongod
     state: restarted
-
-- name: reload systemd
-  systemd:
-    daemon_reload: yes
