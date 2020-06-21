@@ -31,9 +31,13 @@
       }
   notify: restart bigbluebutton
 
-- name: bbb-webrtc | align external IP with Freeswitch
+- name: bbb-webrtc | align external IP with Freeswitch and Kurento
   replace:
     dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
     regexp: '^  ip: .*'
     replace: "  ip: {{ bbb_freeswitch_external_ip }}"
+  with_items:
+    - { re: '^  ip: .*', rep: "  ip: {{ bbb_freeswitch_external_ip }}" }
+    - { re: '^- ip: .*', rep: "- ip: {{ bbb_freeswitch_external_ip }}" }
+    - { re: '^  url: ws://.*/kurento', rep: "  url: ws://{{ bbb_freeswitch_external_ip }}:8888/kurento" }
   notify: restart bigbluebutton
