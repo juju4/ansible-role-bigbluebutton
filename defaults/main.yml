@@ -18,5 +18,14 @@ bbb_system_locale: en_US.UTF-8
 bbb_ssl_cert: "/etc/letsencrypt/live/{{ bbb_hostname }}/fullchain.pem"
 bbb_ssl_key: "/etc/letsencrypt/live/{{ bbb_hostname }}/privkey.pem"
 
-
 bbb_apt_key: 328BD16D
+
+bbb_systemd_hardening: true
+bbb_systemd_override:
+  - { name: freeswitch, t: systemd-override.conf.j2 }
+  - { name: kurento-media-server, t: systemd-override.conf.j2 }
+  - { name: red5, t: systemd-override.conf.j2 }
+  - { name: bbb-web, t: systemd-override.conf.j2 }
+  - { name: bbb-html5, t: systemd-override.conf.j2 }
+# NOK as coturn using init.d
+#  - { name: turnserver, t: systemd-override.conf.j2 }

@@ -135,3 +135,6 @@
 
 - import_tasks: greenlight.yml
   when: bbb_greenlight_enable
+
+- import_tasks: systemd.yml
+  when: bbb_systemd_hardening|bool
