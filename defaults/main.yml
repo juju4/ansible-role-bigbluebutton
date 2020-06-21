@@ -11,8 +11,7 @@ bbb_greenlight_users: []
 bbb_api_demos_enable: false
 bbb_nodejs_version: 8.x
 # ALWAYS_ACCEPT, ALWAYS_DENY, ASK_MODERATOR
-# ASK_MODERATOR is not yet supported yet the HTML5 client.
-bbb_guestpolicy: ALWAYS_ACCEPT
+bbb_guestpolicy: ASK_MODERATOR
 
 bbb_system_locale: en_US.UTF-8
 
