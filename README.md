@@ -99,5 +99,19 @@ This is an example, of how to use this role. Warning: the value of the Variables
       roles:
          - { role: n0emis.bigbluebutton, bbb_turn_secret: ee8d093109a9b273, bbb_greenlight_secret: 107308d54ff4a5f, bbb_greenlight_db_password: 2585c27c785e8895ec, bbb_letsencrypt_email: mail@example.com }
 
+## Troubleshooting
+
+* Using self-signed certificate or letsencrypt staging will lead to "Invalid BigBlueButton Endpoint and Secret" after greenlight user login.
+
+* Client-side: test features on https://test.bigbluebutton.org and https://html5test.com/
+
+* [Error 1007 ICE... Failed joining audio conf.](https://github.com/bigbluebutton/bigbluebutton/issues/8418)
+* [How To Fix Error 1020: media cloud not reach the server](https://github.com/bigbluebutton/bigbluebutton/issues/6797)
+  * Ensure TURN server is enabled
+  * Review [Configure Firewall documentation](https://docs.bigbluebutton.org/2.2/configure-firewall.html)
+  * Review Freeswitch Configuration, especially if restriction IPv4 or IPv6: `/opt/freeswitch/etc/freeswitch/{sip_profiles/external.xml,autoload_configs/acl.conf.xml}`
+  * scan server to check accessible ports
+  * `npm install -g wscat`, `wscat -c ws://<kurento_ip>:8888/kurento` ([#6349](https://github.com/bigbluebutton/bigbluebutton/issues/6349))
+
 ## License
 MIT
