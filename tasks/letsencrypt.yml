@@ -15,7 +15,7 @@
 - name: Change Let's Encrypt API to v2
   lineinfile:
     path: /etc/letsencrypt/cli.ini
-    line: 'server = https://acme-v02.api.letsencrypt.org/directory'
+    line: "server = {{ bbb_letsencrypt_url | default('https://acme-v02.api.letsencrypt.org/directory') }}"
 
 - name: Register certbot certificate file
   stat:
