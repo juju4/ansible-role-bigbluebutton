@@ -11,6 +11,8 @@ lint: |
 platforms:
   - name: instance
     image: ${MOLECULE_DISTRO:-ubuntu:16.04}
+    groups:
+      - bbb
     # env:
     #   http_proxy: ${http_proxy}
     #   https_proxy: ${https_proxy}
