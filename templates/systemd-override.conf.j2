@@ -2,24 +2,28 @@
 NoNewPrivileges=yes
 # Reduce Attack Surface
 PrivateTmp=true
+#PrivateDevices=yes
 ProtectHome=yes
 ProtectSystem=full
-{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 7) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) %}
+{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int > 7) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) %}
+## FIXME! testing needed as currently bbb only on 16.04
+InaccessiblePaths=/proc
 ProtectKernelTunables=true
 ProtectKernelModules=yes
+ProtectControlGroups=true
 RestrictRealtime=true
+RestrictNamespaces=~user mnt
 {% endif %}
 RestrictAddressFamilies=AF_INET AF_INET6
 #LockPersonality=true
 {% if not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "lxc" or ansible_virtualization_type == "docker")
-        ) and
-      not (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int < 8) %}
+          ansible_virtualization_type == "docker"
+        )
+%}
 {% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) %}
-# testing required as currently bbb is only for xenial/systemd 229
 SystemCallFilter=@system-service
 SystemCallFilter=~@debug @mount @cpu-emulation @obsolete @privileged
-# When system call is disallowed, return error code instead of killing process 
+# When system call is disallowed, return error code instead of killing process
 SystemCallErrorNumber=EPERM
 {% endif %}
 {% endif %}
