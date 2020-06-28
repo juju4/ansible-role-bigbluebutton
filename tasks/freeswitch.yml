@@ -41,3 +41,9 @@
     - { re: '^- ip: .*', rep: "- ip: {{ bbb_freeswitch_external_ip }}" }
     - { re: '^  url: ws://.*/kurento', rep: "  url: ws://{{ bbb_freeswitch_external_ip }}:8888/kurento" }
   notify: restart bigbluebutton
+
+- name: Symlink log directory to /var/log
+  file:
+    src: /opt/freeswitch/log
+    dest: /var/log/freeswitch
+    state: link
