@@ -4,6 +4,8 @@ bbb_letsencrypt_enable: true
 bbb_coturn_enable: true
 bbb_turn_enable: true
 bbb_turn_server: "{{ bbb_hostname }}"
+# default coturn tls port is 443 which conflicts with https web access
+bbb_turn_tls_enable: false
 bbb_greenlight_enable: true
 bbb_greenlight_users: []
 #  - { name: '', email: '', password: '', type: 'user' }
