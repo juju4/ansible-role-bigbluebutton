@@ -7,7 +7,7 @@
 - name: restart coturn
   service:
     name: coturn
-    state: reloaded
+    state: restarted
 
 - name: reload nginx
   service:
