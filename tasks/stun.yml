@@ -1,0 +1,24 @@
+---
+
+- name: Set stun server for kurento
+  lineinfile:
+    dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+    regexp: "{{ item.re }}"
+    line: "{{ item.l }}"
+  with_items:
+    - { re: '^externalAddress==', l: "externalAddress={{ bbb_freeswitch_external_ip }}", insertafter: '^;externalAddress=10.20.30.40' }
+  notify:
+    - restart bigbluebutton
+  when: bbb_freeswitch_external_ip is defined and bbb_freeswitch_external_ip
+
+- name: Set stun server for kurento
+  lineinfile:
+    dest: /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+    regexp: "{{ item.re }}"
+    line: "{{ item.l }}"
+  with_items:
+    - { re: '^stunServerAddress=', l: "stunServerAddress={{ bbb_stun_server }}", insertafter: '^;stunServerPort=3478' }
+    - { re: '^stunServerPort=', l: "stunServerPort={{ bbb_stun_port }}", insertafter: '^;stunServerPort=3478' }
+  notify:
+    - restart bigbluebutton
+  when: bbb_stun_server is defined and bbb_stun_server and bbb_stun_port is defined and bbb_stun_port

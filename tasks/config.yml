@@ -98,3 +98,5 @@
 
 - include_tasks: freeswitch.yml
   when: bbb_freeswitch_external_ip is defined and bbb_freeswitch_external_ip
+
+- include_tasks: stun.yml
