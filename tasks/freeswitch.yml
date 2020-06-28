@@ -34,8 +34,8 @@
 - name: bbb-webrtc | align external IP with Freeswitch and Kurento
   replace:
     dest: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
-    regexp: '^  ip: .*'
-    replace: "  ip: {{ bbb_freeswitch_external_ip }}"
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
   with_items:
     - { re: '^  ip: .*', rep: "  ip: {{ bbb_freeswitch_external_ip }}" }
     - { re: '^- ip: .*', rep: "- ip: {{ bbb_freeswitch_external_ip }}" }
