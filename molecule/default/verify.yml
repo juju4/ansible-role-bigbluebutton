@@ -83,6 +83,7 @@
     changed_when: false
     become: yes
     when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+  # FIXME! not validating correctly. Warnings present
   - name: Validate bbb-conf output
     assert:
       that: >
