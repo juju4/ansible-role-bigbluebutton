@@ -1,6 +1,5 @@
 ---
 bbb_hostname: "{{ ansible_fqdn }}"
-bbb_letsencrypt_enable: true
 bbb_coturn_enable: true
 bbb_turn_enable: true
 bbb_turn_server: "{{ bbb_hostname }}"
@@ -17,6 +16,10 @@ bbb_guestpolicy: ASK_MODERATOR
 
 bbb_system_locale: en_US.UTF-8
 
+bbb_letsencrypt_enable: true
+bbb_letsencrypt_backup: true
+bbb_letsencrypt_restore: true
+bbb_orchestrator_archives: 'files'
 bbb_ssl_cert: "/etc/letsencrypt/live/{{ bbb_hostname }}/fullchain.pem"
 bbb_ssl_key: "/etc/letsencrypt/live/{{ bbb_hostname }}/privkey.pem"
 

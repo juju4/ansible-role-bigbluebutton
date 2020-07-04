@@ -22,7 +22,49 @@
     path: "/etc/letsencrypt/live/{{ bbb_hostname }}/fullchain.pem"
   register: certbot_certificate_file_path
 
+- name: Check if certificate backup on orchestrator
+  stat:
+    path: "{{ bbb_orchestrator_archives }}/{{ inventory_hostname }}{{ bbb_ssl_cert }}"
+  connection: local
+  register: localbackup
+
+- debug: var=localbackup verbosity=1
+- debug: var=bbb_orchestrator_archives verbosity=1
+- debug: var=ansible_hostname verbosity=1
+- debug: var=inventory_hostname verbosity=1
+- debug: var=bbb_ssl_cert verbosity=1
+
+- block:
+    - name: Ensure letsencrypt certificate directory exists
+      file:
+        path: "{{ bbb_ssl_cert | dirname }}"
+        state: directory
+        mode: '0755'
+    - name: Restore letsencrypt certificate files
+      copy:
+        src: "{{ bbb_orchestrator_archives }}/{{ inventory_hostname }}{{ item }}"
+        dest: "{{ item }}"
+      with_items:
+        - "{{ bbb_ssl_cert }}"
+        - "{{ bbb_ssl_key }}"
+        - "/etc/letsencrypt/live/{{ bbb_hostname }}/chain.pem"
+        - "/etc/letsencrypt/live/{{ bbb_hostname }}/cert.pem"
+      notify: reload nginx
+  when: not certbot_certificate_file_path.stat.exists and bbb_letsencrypt_restore and localbackup.stat.exists
+
 - name: Generate Certificates
   command: certbot certonly -d {{ bbb_hostname }} -d {{ ansible_fqdn }} --agree-tos --email {{ bbb_letsencrypt_email }} -n --nginx
   notify: reload nginx
-  when: not certbot_certificate_file_path.stat.exists
+  when: not certbot_certificate_file_path.stat.exists and (not bbb_letsencrypt_restore or not localbackup.stat.exists)
+
+- block:
+    - name: Backup letsencrypt certificate files
+      fetch:
+        src: "{{ item }}"
+        dest: "{{ bbb_orchestrator_archives }}"
+      with_items:
+        - "{{ bbb_ssl_cert }}"
+        - "{{ bbb_ssl_key }}"
+        - "/etc/letsencrypt/live/{{ bbb_hostname }}/chain.pem"
+        - "/etc/letsencrypt/live/{{ bbb_hostname }}/cert.pem"
+  when: bbb_letsencrypt_backup and not localbackup.stat.exists
