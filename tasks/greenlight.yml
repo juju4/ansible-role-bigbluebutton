@@ -1,4 +1,5 @@
 ---
+
 - name: ensure pip is installed
   apt:
     name:
@@ -21,6 +22,7 @@
 
 - name: register bbb secret
   command: bbb-conf --secret
+  changed_when: false
   register: result
   changed_when: false
   no_log: true
@@ -45,8 +47,11 @@
 
 - name: copy greenlight nginx configuration file
   template:
-    src: greenlight/greenlight.nginx.j2
-    dest: /etc/bigbluebutton/nginx/greenlight.nginx
+    src: "greenlight/{{ item }}.j2"
+    dest: "/etc/bigbluebutton/nginx/{{ item }}"
+  with_items:
+  - greenlight.nginx
+  - greenlight-redirect.nginx
   notify: reload nginx
 
 - block:
@@ -69,4 +74,4 @@
       failed_when: "'Invalid Arguments' in usercreate.stdout or 'rake aborted!' in usercreate.stderr"
       changed_when: "'Account with that email already exists' not in usercreate.stdout"
 
-  when: bbb_greenlight_enable
+  when: bbb_greenlight_enable | bool

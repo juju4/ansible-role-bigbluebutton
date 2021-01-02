@@ -14,6 +14,11 @@
     name: nginx
     state: reloaded
 
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
 - name: restart freeswitch
   service:
     name: freeswitch
@@ -43,7 +48,23 @@
   command: bbb-conf --restart
   become: true
 
+- name: restart freeswitch
+  systemd:
+    name: freeswitch
+    state: restarted
+  become: true
+
 - name: restart mongo
   service:
     name: mongod
     state: restarted
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: restart monitoring
+  docker_compose:
+    pull: no
+    restarted: true
+    project_src: "{{ bbb_monitoring_all_in_one_directory }}"

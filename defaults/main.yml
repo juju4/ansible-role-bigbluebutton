@@ -1,20 +1,59 @@
 ---
 bbb_hostname: "{{ ansible_fqdn }}"
+bbb_state: "present"
+bbb_upgrade_packages: "{% if bbb_state == 'latest'%}yes{% else %}no{%endif%}"
+bbb_letsencrypt_enable: true
+bbb_nginx_privacy: true
+
 bbb_coturn_enable: true
-bbb_turn_enable: true
-bbb_turn_server: "{{ bbb_hostname }}"
+bbb_coturn_port: 3478
+bbb_coturn_port_tls: 3443
+bbb_coturn_server: "{{ bbb_hostname }}"
+#bbb_coturn_secret: "" <- undefined to set as required
 # default coturn tls port is 443 which conflicts with https web access
-bbb_turn_tls_enable: false
+bbb_coturn_tls_enable: true
+
+bbb_stun_servers:
+- server: "{{ bbb_hostname }}"
+bbb_ice_servers: []
+bbb_turn_servers:
+- server: "{{ bbb_hostname }}"
+  port: "{{ bbb_coturn_port }}"
+  secret: "{{ bbb_coturn_secret }}"
+  tls: false
+- server: "{{ bbb_hostname }}"
+  port: "{{ bbb_coturn_port_tls }}"
+  secret: "{{ bbb_coturn_secret }}"
+  tls: true
+
+bbb_greenlight_enable: true
 bbb_greenlight_enable: true
 bbb_greenlight_users: []
 #  - { name: '', email: '', password: '', type: 'user' }
 #  - { name: '', email: '', password: '', type: 'admin' }
+
+bbb_webhooks_enable: false
+bbb_allow_mail_notifications: true
+bbb_greenlight_hosts: "{{ bbb_hostname }}"
+bbb_disable_recordings: false
 bbb_api_demos_enable: false
+bbb_mute_on_start: false
+bbb_app_log_level: 'DEBUG'
 bbb_nodejs_version: 8.x
+
 # ALWAYS_ACCEPT, ALWAYS_DENY, ASK_MODERATOR
 bbb_guestpolicy: ASK_MODERATOR
 
+bbb_cpuschedule: true
+bbb_freeswitch_ioschedule_realtime: true
+bbb_freeswitch_ipv6: true
+bbb_freeswitch_external_ip: "stun:{{ (bbb_stun_servers | first).server }}"
 bbb_system_locale: en_US.UTF-8
+bbb_mongodb_version: 3.4
+
+# Attention, needs to be encoded with "native2ascii -encoding UTF8"
+bbb_default_welcome_message: Welcome to <b>%%CONFNAME%%</b>!<br><br>For help on using BigBlueButton see these (short) <a href="https://www.bigbluebutton.org/html5"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the phone button.  Use a headset to avoid causing background noise for others.
+bbb_default_welcome_message_footer: This server is running <a href="https://docs.bigbluebutton.org/" target="_blank"><u>BigBlueButton</u></a>.
 
 bbb_letsencrypt_enable: true
 bbb_letsencrypt_backup: true
@@ -23,7 +62,31 @@ bbb_orchestrator_archives: 'files'
 bbb_ssl_cert: "/etc/letsencrypt/live/{{ bbb_hostname }}/fullchain.pem"
 bbb_ssl_key: "/etc/letsencrypt/live/{{ bbb_hostname }}/privkey.pem"
 
-bbb_apt_key: 328BD16D
+bbb_meteor: {}
+bbb_dialplan_quality: "cdquality"
+bbb_dialplan_energy_level: 100
+bbb_dialplan_comfort_noise: 1400
+
+bbb_apt_mirror: "https://ubuntu.bigbluebutton.org"
+bbb_apt_key: 770C4267C5E63474D171B60937B5DD5EFAB46452
+
+ansible_python_interpreter: "/usr/bin/python3"
+
+bbb_monitoring_all_in_one_enable: false
+bbb_monitoring_all_in_one_version: latest
+bbb_monitoring_all_in_one_directory: "/root/bbb-monitoring"
+bbb_monitoring_all_in_one_port: 3001
+bbb_monitoring_recordings_from_disk: true
+
+bbb_dialin_enabled: false
+bbb_dialin_provider_proxy: 'sip.example.net'
+bbb_dialin_provider_username: 'provider-account'
+bbb_dialin_provider_password: 'provider-password'
+bbb_dialin_provider_extension: '6135551234'
+bbb_dialin_default_number: '613-555-1234'
+bbb_dialin_mask_caller: false
+bbb_dialin_overwrite_footer: false
+bbb_dialin_footer: <br><br>To join this meeting by phone, dial:<br>  %%DIALNUM%%<br>Then enter %%CONFNUM%% as the conference PIN number.
 
 bbb_systemd_hardening: true
 bbb_systemd_override:

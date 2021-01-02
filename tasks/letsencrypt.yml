@@ -10,7 +10,7 @@
       - certbot
       - python3-certbot-nginx
     update_cache: true
-    state: present
+    state: "{{ bbb_state }}"
 
 - name: Change Let's Encrypt API to v2
   lineinfile:
@@ -52,10 +52,19 @@
       notify: reload nginx
   when: not certbot_certificate_file_path.stat.exists and bbb_letsencrypt_restore and localbackup.stat.exists
 
-- name: Generate Certificates
-  command: certbot certonly -d {{ bbb_hostname }} -d {{ ansible_fqdn }} --agree-tos --email {{ bbb_letsencrypt_email }} -n --nginx
+- name: Generate Certificates with letsencrypt expire notifications
+  command: certbot certonly {{ certbot_extra_args | default('') }} -d {{ bbb_hostname }} --email {{ bbb_letsencrypt_email }} --agree-tos -n --nginx
   notify: reload nginx
-  when: not certbot_certificate_file_path.stat.exists and (not bbb_letsencrypt_restore or not localbackup.stat.exists)
+  when: >
+    not certbot_certificate_file_path.stat.exists and bbb_letsencrypt_email is defined
+    and (not bbb_letsencrypt_restore or not localbackup.stat.exists)
+
+- name: Generate Certificates without letsencrypt expire notifications
+  command: certbot certonly {{ certbot_extra_args | default('') }} -d {{ bbb_hostname }} --register-unsafely-without-email --agree-tos -n --nginx
+  notify: reload nginx
+  when: >
+    not certbot_certificate_file_path.stat.exists and bbb_letsencrypt_email is not defined
+    and (not bbb_letsencrypt_restore or not localbackup.stat.exists)
 
 - block:
     - name: Backup letsencrypt certificate files

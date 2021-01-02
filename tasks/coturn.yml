@@ -3,7 +3,7 @@
   apt:
     name: coturn
     update_cache: true
-    state: present
+    state: "{{ bbb_state }}"
 
 - name: Copy coturn config-file
   template:
@@ -15,7 +15,7 @@
     src: logrotate/coturn
     dest: /etc/logrotate.d/coturn
 
-- name: enable join via html5
+- name: Enable coturn server in defaults
   lineinfile:
     path: /etc/default/coturn
     regexp: 'TURNSERVER_ENABLED'
