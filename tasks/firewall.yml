@@ -90,23 +90,6 @@
     - tcp
     - udp
 
-- name: user iptables var
-  set_fact:
-    user_fw_rules:
-    # bigbluebutton, freeswitch, meteor, kurento, turnserver, root
-      - uid: 998
-        ports: [ '80', '443' ]
-      - uid: 997
-        ports: [ '80', '443' ]
-      - uid: 995
-        ports: [ '80', '443' ]
-      - uid: 114
-        ports: [ '80', '443' ]
-      - uid: 117
-        ports: [ '80', '443' ]
-      - uid: 0
-        ports: [ '80', '443' ]
-
 - name: Allow outgoing web packets (HTTP+HTTPS) per user
   iptables:
     chain: OUTPUT
@@ -118,7 +101,7 @@
     jump: ACCEPT
     comment: Accept outbound web connections.
   with_subelements:
-    - "{{ user_fw_rules }}"
+    - "{{ bbb_user_fw_rules_outbound }}"
     - ports
 
 - name: Allow outgoing udp by freeswitch user

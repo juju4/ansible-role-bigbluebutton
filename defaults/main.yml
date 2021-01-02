@@ -97,3 +97,19 @@ bbb_systemd_override:
   - { name: bbb-html5, t: systemd-override.conf.j2 }
 # NOK as coturn using init.d
 #  - { name: turnserver, t: systemd-override.conf.j2 }
+
+bbb_firewall_enable: true
+bbb_user_fw_rules_outbound:
+  # bigbluebutton, freeswitch, meteor, kurento, turnserver, root
+  - uid: 998
+    ports: [ '80', '443' ]
+  - uid: 997
+    ports: [ '80', '443' ]
+  - uid: 995
+    ports: [ '80', '443' ]
+  - uid: 114
+    ports: [ '80', '443' ]
+  - uid: 117
+    ports: [ '80', '443' ]
+  - uid: 0
+    ports: [ '80', '443' ]
