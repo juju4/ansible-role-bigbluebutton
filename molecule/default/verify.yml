@@ -126,3 +126,4 @@
     assert:
       that: >
         "'<returncode>SUCCESS</returncode>' in curlapi.content"
+  - debug: var=bbbconf
