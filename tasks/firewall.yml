@@ -83,7 +83,7 @@
   iptables:
     chain: OUTPUT
     protocol: "{{ item }}"
-    destination_port: 53
+    destination_port: '53'
     jump: ACCEPT
     comment: Accept outbound dns connections.
   with_items:
@@ -108,7 +108,7 @@
   iptables:
     chain: OUTPUT
     protocol: udp
-    uid_owner: 997
+    uid_owner: '997'
     jump: ACCEPT
     comment: Accept outbound udp by freeswitch user
 
@@ -116,7 +116,7 @@
   iptables:
     chain: OUTPUT
     protocol: tcp
-    uid_owner: 999
+    uid_owner: '999'
     jump: ACCEPT
     comment: Accept outbound tcp by red5 user
 
@@ -124,7 +124,7 @@
   iptables:
     chain: OUTPUT
     protocol: udp
-    uid_owner: 999
+    uid_owner: '999'
     jump: ACCEPT
     comment: Accept outbound udp by red5 user
 
@@ -145,7 +145,7 @@
     jump: LOG
     comment: Log and accept
     limit: 5/second
-    limit_burst: 20
+    limit_burst: '20'
     log_prefix: "IPTABLES:INFO: "
     log_level: info
 
