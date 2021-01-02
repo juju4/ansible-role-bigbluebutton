@@ -106,7 +106,7 @@
       state: present
     become: yes
   - name: Run stun check
-    command: stun 64.233.177.127:19302 -v
+    command: stun 64.233.177.127:19302 -v  # noqa 301
     register: stuncheck
     ignore_errors: true
   - name: Validate stun output
