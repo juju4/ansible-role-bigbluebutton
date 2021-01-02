@@ -38,12 +38,6 @@
   - greenlight-redirect.nginx
   notify: reload nginx
 
-- name: Xenial | Force jsonschema 3.0.2 with python 3.5
-  pip:
-    name: jsonschema
-    version: 3.0.2
-  when: ansible_distribution_release == 'xenial'
-
 - block:
     - name: start greenlight
       docker_compose:
