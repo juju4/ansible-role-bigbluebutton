@@ -80,6 +80,8 @@
         - docker
         - docker-compose==1.24.1
       state: "{{ bbb_state }}"
+      executable: "{{ bbb_greenlight_pip | default('pip3') }}"
+
   when: bbb_greenlight_enable | bool or bbb_monitoring_all_in_one_enable | bool
 
 - import_tasks: dial-in/main.yml
