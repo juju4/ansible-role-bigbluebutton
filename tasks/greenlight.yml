@@ -1,20 +1,5 @@
 ---
 
-- name: ensure pip is installed
-  apt:
-    name:
-      - python3-pip
-      - python3-setuptools
-    state: present
-
-- name: install python docker packages
-  pip:
-    name:
-      - docker
-      - docker-compose
-    state: present
-    executable: "{{ bbb_greenlight_pip | default('pip3') }}"
-
 - name: create greenlight directory
   file:
     path: /root/greenlight
@@ -24,7 +9,6 @@
   command: bbb-conf --secret
   changed_when: false
   register: result
-  changed_when: false
   no_log: true
   when: not bbb_secret is defined
 
@@ -53,6 +37,12 @@
   - greenlight.nginx
   - greenlight-redirect.nginx
   notify: reload nginx
+
+- name: Xenial | Force jsonschema 3.0.2 with python 3.5
+  pip:
+    name: jsonschema
+    version: 3.0.2
+  when: ansible_distribution_release == 'xenial'
 
 - block:
     - name: start greenlight
