@@ -100,9 +100,7 @@
     syn: match
     jump: ACCEPT
     comment: Accept outbound web connections.
-  with_subelements:
-    - "{{ bbb_user_fw_rules_outbound }}"
-    - ports
+  loop: "{{ bbb_user_fw_rules_outbound | subelements('ports') }}"
 
 - name: Allow outgoing udp by freeswitch user
   iptables:
