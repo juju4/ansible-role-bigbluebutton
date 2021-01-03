@@ -98,6 +98,7 @@ bbb_systemd_override:
 
 bbb_firewall_enable: true
 bbb_user_fw_rules_outbound:
+  # known traffic: 998/bigbluebutton 443, 995/meteor 443, 0/root 80+443
   # bigbluebutton, freeswitch, meteor, kurento, turnserver, root
   - uid: 998
     ports: [ '80', '443' ]
