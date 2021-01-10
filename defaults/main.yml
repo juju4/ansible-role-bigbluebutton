@@ -97,14 +97,69 @@ bbb_systemd_override:
 #  - { name: turnserver, t: systemd-override.conf.j2 }
 
 bbb_firewall_enable: true
-bbb_user_fw_rules_outbound:
+#bbb_fw_input_default: ACCEPT
+#bbb_fw_output_default: ACCEPT
+# There is a Log and Accept rule at the end so this should not be impacting
+bbb_fw_input_default: DROP
+bbb_fw_output_default: DROP
+bbb_sys_fw_rules_ssh_in:
+  - 127.0.0.1
+bbb_sys_fw_rules_outbound:
+  - dst: 167.99.180.121  # ubuntu.bigbluebutton.org
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 91.189.95.85  # ganondorf.canonical.com
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 91.189.89.199  # golem.canonical.com
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 91.189.89.199  # golem.canonical.com
+    ports: [ '123' ]
+    proto: udp
+  - dst: 91.189.88.152  # actiontoad.canonical.com
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 91.189.88.142  # aerodent.canonical.com
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 91.189.91.157  # alphyn.canonical.com
+    ports: [ '123' ]
+    proto: udp
+  - dst: 91.189.89.198  # chilipepper.canonical.com
+    ports: [ '123' ]
+    proto: udp
+  - dst: 92.123.142.195  # a92-123-142-195.deploy.static.akamaitechnologies.com, varia
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 143.204.217.103  # server-143-204-217-103.cdg3.r.cloudfront.net, varia
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 13.32.219.87  # server-13-32-219-87.cdg50.r.cloudfront.net, varia
+    ports: [ '80', '443' ]
+    proto: tcp
+  # https://docs.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
+  # https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/virtual-network/what-is-ip-address-168-63-129-16.md
+  - dst: 168.63.129.16
+    ports: [ '80', '32526' ]
+    proto: tcp
+  # ?
+  - dst: 51.11.236.225  # AS8075 Microsoft
+    ports: [ '80', '443' ]
+    proto: tcp
+  - dst: 64.233.177.127  # yx-in-f127.1e100.net, Google
+    ports: [ '19302' ]
+    proto: udp
+bbb_user_fw_rules_outbound_tcp:
   # known traffic: 998/bigbluebutton 443, 995/meteor 443, 0/root 80+443
-  # bigbluebutton, freeswitch, meteor, kurento, turnserver, root
+  # bigbluebutton, freeswitch, meteor, colord, kurento, turnserver, root
   - uid: 998
     ports: [ '80', '443' ]
   - uid: 997
     ports: [ '80', '443' ]
   - uid: 995
+    ports: [ '80', '443' ]
+  - uid: 113
     ports: [ '80', '443' ]
   - uid: 114
     ports: [ '80', '443' ]
@@ -112,3 +167,8 @@ bbb_user_fw_rules_outbound:
     ports: [ '80', '443' ]
   - uid: 0
     ports: [ '80', '443' ]
+bbb_user_fw_rules_outbound_udp:
+  # known traffic: 114/kurento, 0/root
+  # missing traffic to bbb users. defined port range or process uid?
+  - uid: 114
+  - uid: 0

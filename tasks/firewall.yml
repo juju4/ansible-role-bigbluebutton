@@ -3,6 +3,12 @@
 # but may be better for local monitoring
 # FIXME! need to call iptables-save to have persistent rules
 
+- name: Allow inbound loopback
+  iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+
 - name: Allow related and established connections
   iptables:
     chain: INPUT
@@ -13,11 +19,13 @@
   iptables:
     chain: INPUT
     protocol: tcp
+    source: "{{ item }}"
     destination_port: '22'
     ctstate: NEW
     syn: match
     jump: ACCEPT
     comment: Accept new SSH connections.
+  loop: "{{ bbb_sys_fw_rules_ssh_in }}"
 
 - name: Allow new incoming web packets (HTTP+HTTPS)
   iptables:
@@ -28,7 +36,7 @@
     syn: match
     jump: ACCEPT
     comment: Accept new web connections.
-  with_items:
+  loop:
     - 80
     - 443
     - 8443
@@ -50,7 +58,7 @@
     syn: match
     jump: ACCEPT
     comment: Accept FreeSwitch connections.
-  with_items:
+  loop:
     - 5060
     - 5061
     - 7443
@@ -73,6 +81,12 @@
     jump: ACCEPT
     comment: Accept coturn connections.
 
+- name: Allow outbound loopback
+  iptables:
+    chain: OUTPUT
+    out_interface: lo
+    jump: ACCEPT
+
 - name: Allow related and established outbound connections
   iptables:
     chain: OUTPUT
@@ -86,9 +100,36 @@
     destination_port: '53'
     jump: ACCEPT
     comment: Accept outbound dns connections.
-  with_items:
+  loop:
     - tcp
     - udp
+
+- name: System | Allow outgoing system updates and activities
+  iptables:
+    chain: OUTPUT
+    protocol: "{{ item.0.proto }}"
+    destination: "{{ item.0.dst }}"
+    destination_port: "{{ item.1 }}"
+    jump: ACCEPT
+    comment: Accept outbound system
+  loop: "{{ bbb_sys_fw_rules_outbound | subelements('ports') }}"
+
+- name: Allow outgoing web packets (HTTPS) to server itself - Azure public IP
+  iptables:
+    chain: OUTPUT
+    protocol: tcp
+    destination: "{{ bbb_freeswitch_external_ip }}"
+    destination_port: "{{ item | string }}"
+    ctstate: NEW
+    syn: match
+    jump: ACCEPT
+    comment: Accept outbound web connections to server itself.
+  loop:
+    - 443
+    - 1935
+    - 7443
+    - 8888
+  when: bbb_freeswitch_external_ip|string
 
 - name: Allow outgoing web packets (HTTP+HTTPS) per user
   iptables:
@@ -100,7 +141,16 @@
     syn: match
     jump: ACCEPT
     comment: Accept outbound web connections.
-  loop: "{{ bbb_user_fw_rules_outbound | subelements('ports') }}"
+  loop: "{{ bbb_user_fw_rules_outbound_tcp | subelements('ports') }}"
+
+- name: Allow outgoing udp per user
+  iptables:
+    chain: OUTPUT
+    protocol: udp
+    uid_owner: "{{ item.uid }}"
+    jump: ACCEPT
+    comment: Accept outbound udp connections.
+  loop: "{{ bbb_user_fw_rules_outbound_udp }}"
 
 - name: Allow outgoing udp by freeswitch user
   iptables:
@@ -175,6 +225,16 @@
     protocol: udp
     jump: LOG_ACCEPT
     comment: Accept input.
+
+- name: Set the default policy for the INPUT chain
+  iptables:
+    chain: INPUT
+    policy: "{{ bbb_fw_input_default }}"
+
+- name: Set the default policy for the OUTPUT chain
+  iptables:
+    chain: OUTPUT
+    policy: "{{ bbb_fw_output_default }}"
 
 #- name: Install iptables-persistent
 #  package:
