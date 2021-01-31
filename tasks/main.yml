@@ -23,8 +23,7 @@
     name: "{{ bbb_and_dependencies }}"
     state: "{{ bbb_state }}"
   register: _bbb_install
-  register: pkg_result
-  until: pkg_result is success
+  until: _bbb_install is success
 
 - name: upgrade packages
   apt:
