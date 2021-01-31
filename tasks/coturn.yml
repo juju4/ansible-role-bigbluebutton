@@ -4,6 +4,8 @@
     name: coturn
     update_cache: true
     state: "{{ bbb_state }}"
+  register: pkg_result
+  until: pkg_result is success
 
 - name: Copy coturn config-file
   template:
