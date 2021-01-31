@@ -4,126 +4,126 @@
 - name: Verify
   hosts: bbb
   tasks:
-  - name: Check if needed packages are installed
-    command: "dpkg-query -l {{ item }}"
-    changed_when: false
-    with_items:
-      - language-pack-en
-      - python3-pip
-      - mongodb-org
-      - bbb-check
-      - bbb-html5
-      - bigbluebutton
-  - name: Ensure bigbluebutton.properties file is present
-    stat:
-      path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
-    register: cfg
-  - name: Validate config present
-    assert:
-      that: cfg.stat.exists and cfg.stat.size != 0
-  - name: Ensure red5 config file is present
-    stat:
-      path: /etc/red5/red5.xml
-    register: cfg2
-  - name: Validate config present
-    assert:
-      that: cfg2.stat.exists and cfg2.stat.size != 0
-  - name: Ensure bbb nginx config is enabled
-    stat:
-      path: /etc/nginx/sites-enabled/bigbluebutton
-    register: cfg3
-    become: yes
-  - name: Validate config present
-    assert:
-      that: cfg3.stat.exists and cfg3.stat.size != 0
-  - name: Ensure process is running
-    command: pgrep -u root turnserver
-    register: ps
-    changed_when: false
-    ignore_errors: true
-  - name: Validate ps output
-    assert:
-      that: ps.stdout
-    ignore_errors: true
-  - name: Ensure ports are listening
-    wait_for:
-      host: "{{ item.h }}"
-      port: "{{ item.p }}"
-      timeout: 10
-    with_items:
-      - { h: localhost, p: 443 }
-      # node
-      - { h: localhost, p: 3000 }
-      # freeswitch, some are bind to specific IP
-      - { h: "{{ ansible_default_ipv4.address }}", p: 5060 }
-      - { h: "{{ ansible_default_ipv4.address }}", p: 7443 }
-      - { h: "{{ ansible_default_ipv4.address }}", p: 8081 }
-      # kurento
-      - { h: localhost, p: 8888 }
-      # coturn
-      - { h: localhost, p: 3478 }
-      - { h: localhost, p: 3479 }
-    ignore_errors: true
+    - name: Check if needed packages are installed
+      command: "dpkg-query -l {{ item }}"
+      changed_when: false
+      with_items:
+        - language-pack-en
+        - python3-pip
+        - mongodb-org
+        - bbb-check
+        - bbb-html5
+        - bigbluebutton
+    - name: Ensure bigbluebutton.properties file is present
+      stat:
+        path: /usr/share/bbb-web/WEB-INF/classes/bigbluebutton.properties
+      register: cfg
+    - name: Validate config present
+      assert:
+        that: cfg.stat.exists and cfg.stat.size != 0
+    - name: Ensure red5 config file is present
+      stat:
+        path: /etc/red5/red5.xml
+      register: cfg2
+    - name: Validate config present
+      assert:
+        that: cfg2.stat.exists and cfg2.stat.size != 0
+    - name: Ensure bbb nginx config is enabled
+      stat:
+        path: /etc/nginx/sites-enabled/bigbluebutton
+      register: cfg3
+      become: yes
+    - name: Validate config present
+      assert:
+        that: cfg3.stat.exists and cfg3.stat.size != 0
+    - name: Ensure process is running
+      command: pgrep -u root turnserver
+      register: ps
+      changed_when: false
+      ignore_errors: true
+    - name: Validate ps output
+      assert:
+        that: ps.stdout
+      ignore_errors: true
+    - name: Ensure ports are listening
+      wait_for:
+        host: "{{ item.h }}"
+        port: "{{ item.p }}"
+        timeout: 10
+      with_items:
+        - { h: localhost, p: 443 }
+        # node
+        - { h: localhost, p: 3000 }
+        # freeswitch, some are bind to specific IP
+        - { h: "{{ ansible_default_ipv4.address }}", p: 5060 }
+        - { h: "{{ ansible_default_ipv4.address }}", p: 7443 }
+        - { h: "{{ ansible_default_ipv4.address }}", p: 8081 }
+        # kurento
+        - { h: localhost, p: 8888 }
+        # coturn
+        - { h: localhost, p: 3478 }
+        - { h: localhost, p: 3479 }
+      ignore_errors: true
 
-  # FIXME! bbb-conf relies on systemctl. NOK in docker
-  - name: check if bbb status
-    command: bbb-conf --status
-    register: bbbconf
-    changed_when: false
-    when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
-  - name: Validate bbb-conf output
-    assert:
-      that: >
-        "'Failed to connect to bus: No such file or directory' not in bbbconf.stderr"
-    when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    # FIXME! bbb-conf relies on systemctl. NOK in docker
+    - name: check if bbb status
+      command: bbb-conf --status
+      register: bbbconf
+      changed_when: false
+      when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    - name: Validate bbb-conf output
+      assert:
+        that: >
+          "'Failed to connect to bus: No such file or directory' not in bbbconf.stderr"
+      when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-  - name: bbb-conf check
-    command: bbb-conf --check
-    register: bbbcheck
-    changed_when: false
-    become: yes
-    when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
-  # FIXME! not validating correctly. Warnings present
-  - name: Validate bbb-conf output
-    assert:
-      that: >
-        "'error' not in bbbcheck.stdout and not 'Warning:' in bbbcheck.stdout"
-    when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    - name: bbb-conf check
+      command: bbb-conf --check
+      register: bbbcheck
+      changed_when: false
+      become: yes
+      when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
+    # FIXME! not validating correctly. Warnings present
+    - name: Validate bbb-conf output
+      assert:
+        that: >
+          "'error' not in bbbcheck.stdout and not 'Warning:' in bbbcheck.stdout"
+      when: not (ansible_virtualization_type is defined and ansible_virtualization_type == "docker")
 
-  - name: Fetch content of /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
-    slurp:
-      src: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
-    register: webrtc_cfg
-  - name: Validate /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
-    assert:
-      that: >
-        "'- ip: 10.' not in webrtc_cfg['content'] | b64decode and
-        '  url: ws://127.0.0.1' not in webrtc_cfg['content'] | b64decode"
+    - name: Fetch content of /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+      slurp:
+        src: /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+      register: webrtc_cfg
+    - name: Validate /usr/local/bigbluebutton/bbb-webrtc-sfu/config/default.yml
+      assert:
+        that: >
+          "'- ip: 10.' not in webrtc_cfg['content'] | b64decode and
+          '  url: ws://127.0.0.1' not in webrtc_cfg['content'] | b64decode"
 
-  - name: Install stun client for testing
-    package:
-      name: stun-client
-      state: present
-    become: yes
-  - name: Run stun check
-    command: stun 64.233.177.127:19302 -v  # noqa 301
-    register: stuncheck
-    ignore_errors: true
-  - name: Validate stun output
-    assert:
-      that: >
-        "'STUN client version' in stuncheck.stdout and
-        'Primary: Independent Mapping' in stuncheck.stdout and
-        'Primary: Blocked or could not reach STUN server' not in stuncheck.stdout"
+    - name: Install stun client for testing
+      package:
+        name: stun-client
+        state: present
+      become: yes
+    - name: Run stun check
+      command: stun 64.233.177.127:19302 -v  # noqa 301
+      register: stuncheck
+      ignore_errors: true
+    - name: Validate stun output
+      assert:
+        that: >
+          "'STUN client version' in stuncheck.stdout and
+          'Primary: Independent Mapping' in stuncheck.stdout and
+          'Primary: Blocked or could not reach STUN server' not in stuncheck.stdout"
 
-  - name: Fetch bbb api endpoint
-    uri:
-      url: https://localhost/bigbluebutton/api
-      validate_certs: no
-      return_content: yes
-    register: curlapi
-  - name: Validate bbb api endpoint
-    assert:
-      that: >
-        "'<returncode>SUCCESS</returncode>' in curlapi.content"
-  - debug: var=bbbconf
+    - name: Fetch bbb api endpoint
+      uri:
+        url: https://localhost/bigbluebutton/api
+        validate_certs: no
+        return_content: yes
+      register: curlapi
+    - name: Validate bbb api endpoint
+      assert:
+        that: >
+          "'<returncode>SUCCESS</returncode>' in curlapi.content"
+    - debug: var=bbbconf
