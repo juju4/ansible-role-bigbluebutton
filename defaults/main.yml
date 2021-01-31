@@ -96,6 +96,8 @@ bbb_systemd_override:
 # NOK as coturn using init.d
 #  - { name: turnserver, t: systemd-override.conf.j2 }
 
+bbb_rsyslog_enable: true
+
 bbb_firewall_enable: true
 #bbb_fw_input_default: ACCEPT
 #bbb_fw_output_default: ACCEPT

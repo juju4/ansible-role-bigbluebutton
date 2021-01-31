@@ -1,0 +1,12 @@
+---
+
+- name: Configure rsyslog for bbb
+  template:
+    src: 49-bbb-syslog.conf.j2
+    dest: "/etc/rsyslog.d/49-bbb.conf"
+    owner: root
+    group: root
+    mode: '0644'
+    validate: 'rsyslogd -N2 -f %s'
+  notify:
+    - restart rsyslog

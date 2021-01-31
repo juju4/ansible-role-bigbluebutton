@@ -108,6 +108,9 @@
 - import_tasks: systemd.yml
   when: bbb_systemd_hardening|bool
 
+- import_tasks: rsyslog.yml
+  when: bbb_rsyslog_enable | bool
+
 - import_tasks: firewall.yml
   when: bbb_firewall_enable | bool
 

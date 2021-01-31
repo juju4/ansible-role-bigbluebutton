@@ -1,0 +1,3 @@
+{{ ansible_managed | comment }}
+if ($programname == 'red5.sh' or $programname == 'run-prod.sh' or $programname == 'node' or $programname == 'bbb-webrtc-sfu' or $programname == 'bbb-transcode-akka' or $programname == 'bbb-apps-akka' or $programname == 'bbb-fsesl-akka' or $programname == 'systemd_start.sh') then {{ syslogclient_bbb_syslog_target | default('/var/log/bbb.log') }}
+& stop
